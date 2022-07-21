@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Link Shortener</title>
+    <link href='https://fonts.googleapis.com/css?family=JetBrains%20Mono'>
+    <style>
+        body {
+            background-color: #3e3d40;
+            font-family: "JetBrains Mono", "Droid Sans Mono", serif;
+        }
+
+        main {
+            display: grid;
+            place-items: center;
+            padding: 50px;
+            margin: 30px;
+        }
+
+        .box {
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: #2e80bb;
+            padding: 20px;
+            width: 200px;
+            height: 150px;
+            margin: 30px;
+        }
+
+        .ok {
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: forestgreen;
+            padding: 20px;
+            width: 300px;
+            height: 50px;
+            margin: 30px;
+        }
+
+        .error {
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: indianred;
+            padding: 20px;
+            width: 300px;
+            height: 50px;
+            margin: 30px;
+        }
+
+        .light-backgound {
+            border-radius: 1px;
+            background-color: darkgray;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <div class="box">
+        <label for="url">Enter a URL</label>
+        <input type="url" name="url" id="url" placeholder="https://example.com">
+        <button id="add-link">POST</button>
+    </div>
+
+    <div id="response"></div>
+</main>
+<script>
+    document.getElementById("add-link").addEventListener("click", () => {
+        const url = document.getElementById("url").value;
+
+        let status;
+
+        fetch("/add-link", {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({url: url})
+        })
+            .then((response) => {
+                if (response.status === 200) {
+                status = response.status;
+                return response.json();
+                } else if (response.status === 400) {
+                    document.getElementById("response").innerHTML = `
+                    <div class="error">
+                        <p>The submitted URL was invalid.</p>
+                    </div>
+                    `;
+                }
+            })
+            .then((data) => {
+                if (data) {
+                    document.getElementById("response").innerHTML = `
+                    <div class="ok">
+                        <span>Your link is: <span class="light-backgound">http://localhost/${data.key}</span></span>
+                    </div>
+                    `;
+                }
+            });
+    });
+</script>
+</body>
+</html>
